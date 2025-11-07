@@ -528,17 +528,17 @@ impl Profile {
         let profile_path = configdir.join("profiles").join(format!("{}.env", name));
 
         let exists = profile_path.exists();
-        if exists {
-            println!("The profile does  exist");
-            println!("DEBUG: configdir={}", configdir.display());
-            println!("DEBUG: profile_path={}", profile_path.display());
-            debug!("Profile '{}' exists at '{}'", name, profile_path.display());
-        } else {
-            println!("The profile does not exist");
-            eprintln!("DEBUG: configdir={}", configdir.display());
-            eprintln!("DEBUG: profile_path={}", profile_path.display());
-            debug!("Profile '{}' does NOT exist at '{}'", name, profile_path.display());
-        }
+        // if exists {
+        //     println!("The profile does  exist");
+        //     println!("DEBUG: configdir={}", configdir.display());
+        //     println!("DEBUG: profile_path={}", profile_path.display());
+        //     debug!("Profile '{}' exists at '{}'", name, profile_path.display());
+        // } else {
+        //     println!("The profile does not exist");
+        //     eprintln!("DEBUG: configdir={}", configdir.display());
+        //     eprintln!("DEBUG: profile_path={}", profile_path.display());
+        //     debug!("Profile '{}' does NOT exist at '{}'", name, profile_path.display());
+        // }
     
         if profile_path.exists() {
             return true;
