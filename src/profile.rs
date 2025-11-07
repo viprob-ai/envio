@@ -697,71 +697,10 @@ impl Profile {
 
         file.write_all(&encrypted_data)?;
 
-        file.flush()?
+        file.flush()?;
 
         file.sync_all()?;
 
         Ok(())
     }
 }
-
-/// A macro which simplifies the process of loading a profile from the system
-///
-/// # Parameters
-/// - `name` - The name of the profile
-/// - `get_key` - A closure which returns the key used to decrypt the profile.
-///   It is only required if the profile is encrypted using the `age` encryption
-///   type. You can omit this parameter if the profile is encrypted using the `gpg` encryption type. To figure out which encryption type is used, you can
-/// use the [get_encryption_type](crate::crypto::get_encryption_type) function
-/// from the `crypto` module.
-///
-/// `name` can either be the name of the profile or the absolute path to the
-/// profile file.
-///
-/// <div class="warning">Please note that it is not recommended to hardcode the key in the closure. It is recommended to use a password manager to store the key and then retrieve it here or promp[...]
-///
-/// # Returns
-/// - `Result<Profile>`: the profile object if the operation was successful or
-///   an error if it was not
-///
-/// # Examples
-///
-/// If the profile is encrypted using the `gpg` encryption type:
-/// ```
-/// use envio::load_profile;
-///
-/// let profile = match load_profile!("my-profile") {
-///    Ok(p) => p,
-///    Err(e) => {
-///     eprintln!("An error occurred: {}", e);
-///     return;
-///    }
-/// };
-///
-/// for (key, value) in profile.envs.iter() {
-///   println!("{}={}", key, value);
-/// }
-///
-/// ```
-///
-/// If the profile is encrypted using the `age` encryption type:
-/// ```
-/// use envio::load_profile;
-///
-/// let profile = match load_profile!("my-profile", || {
-///    // This closure should return the key used to decrypt the profile
-///    // It is recommended to use a password manager to store the key and then retrieve it here
-///    // Or prompt the user to enter the key
-///    "my-key".to_string()
-/// }) {
-///    Ok(p) => p,
-///    Err(e) => {
-///        eprintln!("An error occurred: {}", e);
-///        return;
-///    }
-/// };
-///
-/// for (key, value) in profile.envs.iter() {
-///   println!("{}={}", key, value);
-/// }
-/// ```
