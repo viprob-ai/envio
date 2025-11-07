@@ -66,18 +66,12 @@ pub fn initalize_config() -> Result<()> {
                     "bass".bold()
                 );
             format!(
-                "
-# envio DO NOT MODIFY
-bass source {}
-",
+                "\n # envio DO NOT MODIFY\n bass source {}\n ",
                 shellscript_path.to_str().unwrap()
             )
         } else {
             format!(
-                "
-#envio DO NOT MODIFY
-source {}
-",
+                "\n #envio DO NOT MODIFY\n source {}\n ",
                 shellscript_path.to_str().unwrap()
             )
         };
@@ -92,6 +86,12 @@ source {}
 /// # Returns
 /// - `PathBuf`: the home directory
 pub fn get_homedir() -> Result<PathBuf> {
+    if let Some(dir_os) = std::env::var_os("ENVIO_CONFIG_DIR") {
+        if !dir_os.is_empty() {
+            return Ok(PathBuf::from(dir_os));
+        }
+    }
+
     match dirs::home_dir() {
         Some(home) => Ok(home),
         None => Err(Error::Io(std::io::Error::new(
@@ -110,7 +110,7 @@ pub fn get_configdir() -> Result<PathBuf> {
 }
 
 pub fn contains_path_separator(s: &str) -> bool {
-    s.contains('/') || s.contains('\\')
+    s.contains('/') || s.contains('\')
 }
 
 pub fn get_cwd() -> PathBuf {
