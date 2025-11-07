@@ -86,11 +86,7 @@ pub fn initalize_config() -> Result<()> {
 /// # Returns
 /// - `PathBuf`: the home directory
 pub fn get_homedir() -> Result<PathBuf> {
-    if let Some(dir_os) = std::env::var_os("ENVIO_CONFIG_DIR") {
-        if !dir_os.is_empty() {
-            return Ok(PathBuf::from(dir_os));
-        }
-    }
+
 
     match dirs::home_dir() {
         Some(home) => Ok(home),
@@ -106,11 +102,16 @@ pub fn get_homedir() -> Result<PathBuf> {
 /// # Returns
 /// - `PathBuf`: the config directory
 pub fn get_configdir() -> Result<PathBuf> {
+    if let Some(dir_os) = std::env::var_os("ENVIO_CONFIG_DIR") {
+        if !dir_os.is_empty() {
+            return Ok(PathBuf::from(dir_os));
+        }
+    }
     Ok(get_homedir()?.join(".envio"))
 }
 
 pub fn contains_path_separator(s: &str) -> bool {
-    s.contains('/') || s.contains('\')
+    s.contains('/') || s.contains('\\')
 }
 
 pub fn get_cwd() -> PathBuf {
