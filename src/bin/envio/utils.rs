@@ -1,3 +1,6 @@
+
+
+
 use std::fs::File;
 /// Utility functions used throughout the binary crate
 use std::io::Write;
@@ -66,12 +69,18 @@ pub fn initalize_config() -> Result<()> {
                     "bass".bold()
                 );
             format!(
-                "\n # envio DO NOT MODIFY\n bass source {}\n ",
+                "
+# envio DO NOT MODIFY
+bass source {}
+",
                 shellscript_path.to_str().unwrap()
             )
         } else {
             format!(
-                "\n #envio DO NOT MODIFY\n source {}\n ",
+                "
+#envio DO NOT MODIFY
+source {}
+",
                 shellscript_path.to_str().unwrap()
             )
         };
@@ -86,8 +95,6 @@ pub fn initalize_config() -> Result<()> {
 /// # Returns
 /// - `PathBuf`: the home directory
 pub fn get_homedir() -> Result<PathBuf> {
-
-
     match dirs::home_dir() {
         Some(home) => Ok(home),
         None => Err(Error::Io(std::io::Error::new(
@@ -109,6 +116,7 @@ pub fn get_configdir() -> Result<PathBuf> {
     }
     Ok(get_homedir()?.join(".envio"))
 }
+
 
 pub fn contains_path_separator(s: &str) -> bool {
     s.contains('/') || s.contains('\\')
