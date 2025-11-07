@@ -11,6 +11,8 @@ use crate::utils::{self, get_configdir, truncate_identity_bytes};
 use crate::crypto::EncryptionType;
 use crate::error::{Error, Result};
 
+use tracing::debug;
+
 /// Representation of an environment variable
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Env {
@@ -525,6 +527,13 @@ impl Profile {
 
         let profile_path = configdir.join("profiles").join(format!("{}.env", name));
 
+        let exists = profile_path.exists();
+        if exists {
+            debug!("Profile '{}' exists at '{}'", name, profile_path.display());
+        } else {
+            debug!("Profile '{}' does NOT exist at '{}'", name, profile_path.display());
+        }
+    
         if profile_path.exists() {
             return true;
         }
