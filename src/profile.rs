@@ -529,8 +529,10 @@ impl Profile {
 
         let exists = profile_path.exists();
         if exists {
+            println!("The profile does  exist");
             debug!("Profile '{}' exists at '{}'", name, profile_path.display());
         } else {
+            println!("The profile does not exist");
             debug!("Profile '{}' does NOT exist at '{}'", name, profile_path.display());
         }
     
