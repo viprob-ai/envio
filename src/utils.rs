@@ -54,14 +54,14 @@ pub fn get_profile_content(name: &str) -> Result<Vec<u8>> {
     Ok(encrypted_contents)
 }
 
-pub fn get_configdir() -> Result<PathBuf> {
+pub fn get_configdir() -> PathBuf {
     if let Some(dir_os) = std::env::var_os("ENVIO_CONFIG_DIR") {
         if !dir_os.is_empty() {
-            return Ok(PathBuf::from(dir_os));
+            return PathBuf::from(dir_os);
         }
     }
     let homedir = dirs::home_dir().unwrap();
-    Ok(homedir.join(".envio"))
+    homedir.join(".envio")
 }
 
 pub fn truncate_identity_bytes(encrypted_contents: &[u8]) -> Vec<u8> {
