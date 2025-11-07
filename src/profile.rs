@@ -142,12 +142,12 @@ impl EnvVec {
     }
 
     /// Return an iterator over the `EnvVec`
-    pub fn iter(&self) -> std::slice::Iter<Env> {
+    pub fn iter(&self) -> std::slice::Iter<'_, Env> {
         self.envs.iter()
     }
 
     /// Return a mutable iterator over the `EnvVec`
-    pub fn iter_mut(&mut self) -> std::slice::IterMut<Env> {
+    pub fn iter_mut(&mut self) -> std::slice::IterMut<'_, Env> {
         self.envs.iter_mut()
     }
 
@@ -350,17 +350,17 @@ impl<'a> IntoIterator for &'a mut EnvVec {
 ///   // Read the contents of the profile file
 ///   // A utility function is provided to do this or you can load the contents yourself
 ///   let encrypted_content = envio::utils::get_profile_content("my-profile").unwrap();
-///
+///   
 ///   // Load the profile assuming the encryption type is `age`
 ///   let mut profile = Profile::from_content("my-profile", &encrypted_content, envio::crypto::get_encryption_type(&encrypted_content).unwrap()).unwrap();
 ///   
 ///   // Or use the load_profile macro
 ///   let mut profile = envio::load_profile!("my-profile").unwrap();
-///
+///   
 ///   for (key, value) in profile.envs.iter() {
 ///    println!("{}={}", key, value);
 ///   }
-///
+///   
 ///   // Add a new environment variable to the profile
 ///   profile.insert_env("NEW_ENV".to_string(), "new_value".to_string());
 ///   
@@ -441,11 +441,10 @@ impl Profile {
                 println!(
                     "{}",
                     format!(
-                        "{}: Unable to deserialize the profile content\n\
-                    \n\
-                    This may indicate:\n\
-                     - The file has been tampered with\n\
-                     - It was created with an older version of the tool\n",
+                        "{}: Unable to deserialize the profile content\n\n
+                        This may indicate:\n
+                         - The file has been tampered with\n
+                         - It was created with an older version of the tool\n",
                         "Warning".yellow().bold()
                     )
                 );
@@ -535,7 +534,7 @@ impl Profile {
     /// Add a new environment variable to the profile
     ///
     /// # Parameters
-    /// - `env` - The name of the environment variable
+    /// - `env` - The name of the profile
     /// - `env_value` - The value of the environment variable
     ///
     /// # Examples
@@ -624,7 +623,6 @@ impl Profile {
     /// - `Option<&String>`: The value of the environment variable if it exists
     ///
     /// # Examples
-    ///
     /// ```
     /// use envio::load_profile;
     ///
@@ -664,13 +662,12 @@ impl Profile {
     /// - `Result<()>`: indicating whether the operation was successful or not
     ///
     /// # Examples
-    ///
     /// ```
     /// use envio::load_profile;
     ///
     /// let mut profile = load_profile!("my-profile").unwrap();
     ///
-    /// profile.insert_env("NEW_ENV".to_string(), "new_value".to_string());
+    /// profile.insert_env("NEW_ENV".to_string(), "NEW_VALUE".to_string());
     ///
     /// profile.push_changes().unwrap();
     ///
@@ -700,7 +697,7 @@ impl Profile {
 
         file.write_all(&encrypted_data)?;
 
-        file.flush()?;
+        file.flush()?
 
         file.sync_all()?;
 
@@ -714,15 +711,14 @@ impl Profile {
 /// - `name` - The name of the profile
 /// - `get_key` - A closure which returns the key used to decrypt the profile.
 ///   It is only required if the profile is encrypted using the `age` encryption
-///   type. You can omit this parameter if the profile is encrypted using the
-///  `gpg` encryption type. To figure out which encryption type is used, you can
+///   type. You can omit this parameter if the profile is encrypted using the `gpg` encryption type. To figure out which encryption type is used, you can
 /// use the [get_encryption_type](crate::crypto::get_encryption_type) function
 /// from the `crypto` module.
 ///
 /// `name` can either be the name of the profile or the absolute path to the
 /// profile file.
 ///
-/// <div class="warning">Please note that it is not recommended to hardcode the key in the closure. It is recommended to use a password manager to store the key and then retrieve it here or prompt the user to enter the key.</div>
+/// <div class="warning">Please note that it is not recommended to hardcode the key in the closure. It is recommended to use a password manager to store the key and then retrieve it here or promp[...]
 ///
 /// # Returns
 /// - `Result<Profile>`: the profile object if the operation was successful or
@@ -768,34 +764,4 @@ impl Profile {
 /// for (key, value) in profile.envs.iter() {
 ///   println!("{}={}", key, value);
 /// }
-///
 /// ```
-#[macro_export]
-macro_rules! load_profile {
-    ($name:expr $(, $get_key:expr)?) => {
-        (||->envio::error::Result<envio::Profile> {
-            use envio::Profile;
-            use envio::crypto;
-            use envio::utils;
-
-            let mut encryption_type;
-
-            match crypto::get_encryption_type($name) {
-                Ok(t) => encryption_type = t,
-                Err(e) => return Err(e.into()),
-            }
-
-            if encryption_type.as_string() == "age" {
-                $(
-                    let key = $get_key();
-                    encryption_type.set_key(key);
-                )?
-            }
-
-            match Profile::from($name, encryption_type) {
-                Ok(profile) => return Ok(profile),
-                Err(e) => return Err(e.into()),
-            }
-         })()
-    };
-}
